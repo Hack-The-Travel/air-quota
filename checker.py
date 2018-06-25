@@ -36,23 +36,23 @@ def get_ticket_quota(user, password, gateway='https://ws.sirena-travel.ru/swc-ma
     return extract_ticket_quota(r.text)
 
 
-def save_check(db_name, account, ticket_quota):
+def save_check(db_name, account_code, ticket_quota):
     db_execute(
         db_name,
         '''INSERT INTO quota_check (account, quota)
            VALUES ('{account}', {quota})
-        '''.format(account=account, quota=ticket_quota)
+        '''.format(account=account_code, quota=ticket_quota)
     )
 
 
 if __name__ == '__main__':
-    for account in conf.accounts:
+    for code, account in conf.accounts.items():
         try:
             save_check(
                 conf.db_name,
-                account['account'],
+                code,
                 get_ticket_quota(account['user'], account['password'])
             )
-            print('{:20} - ok'.format(account['account']))
+            print('{:20} - ok'.format(code))
         except Exception:
-            print('{:20} - error'.format(account['account']))
+            print('{:20} - error'.format(code))
