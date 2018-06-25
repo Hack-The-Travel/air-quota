@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 import requests
+import logging
 from utils import db_execute
 import conf
 
@@ -54,5 +55,6 @@ if __name__ == '__main__':
                 get_ticket_quota(account['user'], account['password'])
             )
             print('{:20} - ok'.format(code))
-        except Exception:
+        except Exception as e:
             print('{:20} - error'.format(code))
+            logging.critical(e, exc_info=True)
