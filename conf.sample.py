@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+import os
+
+here = os.path.dirname(os.path.abspath(__file__))
+
+
 accounts = {
     'OTA.TCH': {
         'user': 'ota_grs101',
@@ -12,7 +17,7 @@ accounts = {
 sender = ('Anton Yakovlev', 'anton.yakovlev@a.gentlemantravel.club')
 recipient_info = 'airquota@ota.ru'
 recipient_alert = 'airquota.alert@ota.ru'
-db_name = 'db/quota.db'
+db_name = os.path.join(here, 'db/quota.db')
 smtp_gateway= 'email-smtp.eu-west-1.amazonaws.com'
 smtp_port = 587
 smtp_user = 'aws_ses_user'
