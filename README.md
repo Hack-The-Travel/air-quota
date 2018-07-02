@@ -2,6 +2,14 @@ sirena-quota
 ============
 
 It's the best way to control tickets quota in Sirena.
+Notice, these scripts works with Sirena Web Services (SWC), not with Sirena XML Gate.
+
+Behold, the power of:
+```
+$ python checker.py
+OTA.UT               - ok
+$ python informer.py
+```
 
 
 ## Installation
