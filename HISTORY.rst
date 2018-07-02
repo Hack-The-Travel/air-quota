@@ -3,6 +3,14 @@
 Release History
 ===============
 
+dev
++++
+
+**Bugfixes**
+
+- Supported relative location of db storage.
+
+
 1.0.0 (2018-07-02)
 ++++++++++++++++++
 
