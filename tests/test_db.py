@@ -4,9 +4,11 @@ import os
 import pytest
 from manage import setup_store
 
+here = os.path.dirname(os.path.abspath(__file__))
+
 
 class TestDB():
-    db_name = 'db/test.db'
+    db_name = os.path.join(here, '../db/test.db')
 
     def test_init_db(self):
         try:
