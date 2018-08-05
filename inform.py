@@ -14,7 +14,8 @@ def prepare_body(accounts_info, sender_name):
     Structure of accounts_info
     >>> accounts_info = [{
     >>>     'code': 'OTA.TCH',
-    >>>     'quota': 985,
+    >>>     'remaining_tickets': 985,
+    >>>     'remaining_emds': 400,
     >>>     'datetime': '2018-06-23 19:26:16 (MSK)',
     >>>     'alert': False,
     >>> }]
@@ -27,10 +28,12 @@ def prepare_body(accounts_info, sender_name):
     status_msg = ''
     alert_accounts = list()
     for account in accounts_info:
+        tickets = '¯\_(ツ)_/¯' if account['remaining_tickets'] is None else account['remaining_tickets']
+        emds = '¯\_(ツ)_/¯' if account['remaining_emds'] is None else account['remaining_emds']
         if account['alert']:
             alert_accounts.append(account['code'])
-        status_msg += '{account} - {quota}, проверено {dt}\r\n'\
-            .format(account=account['code'], quota=account['quota'], dt=account['datetime'])
+        status_msg += '{account}: {tickets} билетов, {emds} EMD, проверено {dt}\r\n'\
+            .format(account=account['code'], tickets=tickets, emds=emds, dt=account['datetime'])
     alert_msg = ''
     if len(alert_accounts):
         alert_msg = 'Срочно запросите квоту для: ' + ', '.join(alert_accounts) + '!\r\n\r\n'
@@ -49,7 +52,7 @@ def prepare_body(accounts_info, sender_name):
         '<body>'
         '<p>Приветствую</p>'
         '{alert}'
-        '<p>Состояние стоков:<br />{status_msg}</p>'
+        '<p>Состояние стоков<br />{status_msg}</p>'
         '<p>'
         '<br /><br />'
         '--<br />'
@@ -78,6 +81,9 @@ def send_mail(sender, recipient, subject, body, smtp_user, smtp_password,
     :param smtp_user: str, login of smtp user
     :param smtp_password: str, password of smtp user
     """
+    # At AWS side Verification Check is case-sensitive - WTF?!
+    recipient = recipient.lower()
+
     body_text, body_html = body
     msg = MIMEMultipart('alternative')
     msg['Subject'] = subject
@@ -97,7 +103,9 @@ def send_mail(sender, recipient, subject, body, smtp_user, smtp_password,
 if __name__ == '__main__':
     rows = db_execute(
         conf.db_name,
-        'SELECT account, quota, created_at FROM quota_check GROUP BY account HAVING MAX(created_at)'
+        'SELECT account, remaining_tickets, remaining_emds, created_at'
+        ' FROM quota_check'
+        ' GROUP BY account HAVING MAX(created_at)'
     )
     info_items = list()
     alert = False
@@ -106,13 +114,15 @@ if __name__ == '__main__':
             continue  # unknown account code
         info_items.append({
             'code': row[0],
-            'quota': row[1],
-            'datetime': time.strftime('%Y-%m-%d %H:%M:%S (%Z)', time.localtime(row[2])),
-            'alert': row[1] <= conf.accounts[row[0]].get('alert', 0),
+            'remaining_tickets': row[1],
+            'remaining_emds': row[2],
+            'datetime': time.strftime('%Y-%m-%d %H:%M:%S (%Z)', time.localtime(row[3])),
+            'alert': (row[1] or 0) < conf.accounts[row[0]].get('alert', 0),
         })
         alert = info_items[-1]['alert'] or alert
-    send_mail(conf.sender, conf.recipient_info, 'Состояние стоков в Сирене',
-              prepare_body(info_items, conf.sender[0]), conf.smtp_user, conf.smtp_password)
+    message_body = prepare_body(info_items, conf.sender[0])
+    send_mail(conf.sender, conf.recipient_info, 'Состояние стоков',
+              message_body, conf.smtp_user, conf.smtp_password)
     if alert:
-        send_mail(conf.sender, conf.recipient_alert, 'Срочно пополните сток в Сирене',
-                  prepare_body(info_items, conf.sender[0]), conf.smtp_user, conf.smtp_password)
+        send_mail(conf.sender, conf.recipient_alert, 'Срочно пополните сток',
+                  message_body, conf.smtp_user, conf.smtp_password)

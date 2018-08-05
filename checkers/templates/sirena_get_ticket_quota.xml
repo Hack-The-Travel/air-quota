@@ -1,0 +1,8 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ser="http://service.swc.comtech/">
+    <soapenv:Header/>
+        <soapenv:Body>
+            <ser:getTicketQuota>
+                <dynamicId>0</dynamicId>
+            </ser:getTicketQuota>
+        </soapenv:Body>
+</soapenv:Envelope>
