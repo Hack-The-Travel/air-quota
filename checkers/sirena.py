@@ -26,8 +26,5 @@ class SirenaQuotaChecker(QuotaChecker):
         rq = self.render_template('sirena_get_ticket_quota.xml', context=None)
         rs = self.request(self.endpoint, auth=(self.user, self.password), data=rq)
         quota = QuotaResponse()
-        try:
-            quota.tickets = self.extract_ticket_quota(rs)
-        except Exception:
-            pass
+        quota.tickets = self.extract_ticket_quota(rs)
         return quota

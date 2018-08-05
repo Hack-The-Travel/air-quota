@@ -117,7 +117,7 @@ if __name__ == '__main__':
             'remaining_tickets': row[1],
             'remaining_emds': row[2],
             'datetime': time.strftime('%Y-%m-%d %H:%M:%S (%Z)', time.localtime(row[3])),
-            'alert': row[1] <= conf.accounts[row[0]].get('alert', 0),
+            'alert': (row[1] or 0) < conf.accounts[row[0]].get('alert', 0),
         })
         alert = info_items[-1]['alert'] or alert
     message_body = prepare_body(info_items, conf.sender[0])

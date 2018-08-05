@@ -82,8 +82,5 @@ class AmadeusQuotaChecker(QuotaChecker):
         })
         rs = self.request(self.endpoint, headers=headers, data=rq)
         quota = QuotaResponse()
-        try:
-            quota.tickets, quota.emds = self.extract_quota(rs)
-        except Exception:
-            pass
+        quota.tickets, quota.emds = self.extract_quota(rs)
         return quota
