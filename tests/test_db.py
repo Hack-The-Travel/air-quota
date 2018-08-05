@@ -12,7 +12,8 @@ class TestDB():
 
     def test_init_db(self):
         try:
-            os.remove(self.db_name)
+            if os.path.isfile(self.db_name):
+                os.remove(self.db_name)
         except OSError:
             pytest.fail('Unexpected error trying to delete {}'.format(self.db_name), pytrace=True)
         conn = sqlite3.connect(self.db_name)

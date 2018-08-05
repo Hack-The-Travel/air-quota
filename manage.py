@@ -10,7 +10,8 @@ def setup_store(db_name):
         '''CREATE TABLE IF NOT EXISTS quota_check (
             id INTEGER PRIMARY KEY,
             account VARCHAR,
-            quota INTEGER,
+            remaining_tickets INTEGER,
+            remaining_emds INTEGER,
             created_at integer(4) not null default (strftime('%s','now'))
         )'''
     )
